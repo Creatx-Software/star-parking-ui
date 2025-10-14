@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaints & Claims Desk - Star Parking</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Error Boundary -->
+    <div id="error-boundary" class="d-none alert alert-danger m-4" role="alert">
+        <h6 class="alert-heading mb-2">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Application Error
+        </h6>
+        <pre id="error-message" class="mb-0 small"></pre>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" class="min-vh-100 p-3 p-md-4">
+        <div class="container-fluid" style="max-width: 1400px;">
+            <!-- Header -->
+            <header class="row mb-3">
+                <div class="col-12 col-md-6">
+                    <h1 class="h2 fw-semibold mb-1">Complaints & Claims Desk</h1>
+                    <p class="text-muted small mb-0">Customer tickets • Evidence • Outcomes • Repairs</p>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="d-flex flex-column flex-md-row gap-2 mt-2 mt-md-0">
+                        <input 
+                            type="search" 
+                            id="search-input" 
+                            class="form-control"
+                            placeholder="Search ID, name, reg, status"
+                            aria-label="Search tickets"
+                        >
+                        <select id="tab-selector" class="form-select" style="width: auto;">
+                            <option value="portal">Portal (customer)</option>
+                            <option value="desk">Desk (back office)</option>
+                            <option value="reports">Reports</option>
+                            <option value="settings">Settings</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tab Content -->
+            <main>
+                <!-- Portal Tab -->
+                <section id="portal-tab" class="tab-content">
+                    <div class="row g-3">
+                        <div class="col-12 col-lg-7">
+                            <div class="card h-100">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">File a complaint (customer view)</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="complaint-form" novalidate>
+                                        <!-- Nature Selection -->
+                                        <div class="mb-3">
+                                            <label for="complaint-nature" class="form-label">Nature of complaint</label>
+                                            <select id="complaint-nature" class="form-select" required>
+                                                <option value="">Select nature</option>
+                                                <option value="Damage">Damage</option>
+                                                <option value="Mileage">Mileage</option>
+                                                <option value="Long waiting">Long waiting</option>
+                                                <option value="Service failure">Service failure</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Customer Info -->
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-md-6">
+                                                <label for="customer-name" class="form-label">Full name *</label>
+                                                <input type="text" id="customer-name" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="customer-phone" class="form-label">Phone *</label>
+                                                <input type="tel" id="customer-phone" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="customer-email" class="form-label">Email</label>
+                                                <input type="email" id="customer-email" class="form-control">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="vehicle-reg" class="form-label">Vehicle registration</label>
+                                                <input type="text" id="vehicle-reg" class="form-control">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="terminal" class="form-label">Terminal</label>
+                                                <input type="text" id="terminal" class="form-control">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="driver-name" class="form-label">Driver name (if known)</label>
+                                                <input type="text" id="driver-name" class="form-control">
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="customer-address" class="form-label">Address</label>
+                                                <input type="text" id="customer-address" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <!-- Damage-specific fields -->
+                                        <div id="damage-fields" class="d-none">
+                                            <div class="mb-3">
+                                                <label class="form-label">Damage types</label>
+                                                <div class="row g-2" id="damage-types">
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value="Dent" id="damage-dent">
+                                                            <label class="form-check-label" for="damage-dent">Dent</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value="Scratch" id="damage-scratch">
+                                                            <label class="form-check-label" for="damage-scratch">Scratch</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value="Wheel curb" id="damage-wheel">
+                                                            <label class="form-check-label" for="damage-wheel">Wheel curb</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value="Mechanical" id="damage-mechanical">
+                                                            <label class="form-check-label" for="damage-mechanical">Mechanical</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value="Other" id="damage-other">
+                                                            <label class="form-check-label" for="damage-other">Other</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="incident-date" class="form-label">Incident date</label>
+                                                    <input type="date" id="incident-date" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 d-flex align-items-end">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="notified-driver">
+                                                        <label class="form-check-label" for="notified-driver">
+                                                            I told the driver at the time
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="timing-section" class="mb-3 d-none">
+                                                <label class="form-label">When was this informed?</label>
+                                                <div class="row g-2">
+                                                    <div class="col-12">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="informed-timing" value="Before leaving official ground" id="timing-before">
+                                                            <label class="form-check-label" for="timing-before">
+                                                                Before leaving official ground
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="informed-timing" value="After leaving official ground" id="timing-after">
+                                                            <label class="form-check-label" for="timing-after">
+                                                                After leaving official ground
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Description -->
+                                        <div class="mb-3">
+                                            <label for="complaint-description" class="form-label">Describe what happened *</label>
+                                            <textarea id="complaint-description" class="form-control" rows="5" required></textarea>
+                                        </div>
+
+                                        <!-- Submit -->
+                                        <div class="d-flex align-items-center gap-2">
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="bi bi-plus-circle me-2"></i>
+                                                Create ticket
+                                            </button>
+                                            <small class="text-muted">A ticket ID will be generated and sent to the customer.</small>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-5">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">What the customer sees</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-3">After submission, they receive:</p>
+                                    <ul class="customer-info-list">
+                                        <li>Ticket ID and created time</li>
+                                        <li>Summary of the complaint</li>
+                                        <li>Link to upload more photos or videos or docs</li>
+                                        <li>Status tracker New to Triage to Investigating and more</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Desk Tab -->
+                <section id="desk-tab" class="tab-content d-none">
+                    <div class="row g-3">
+                        <div class="col-12 col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Tickets</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div id="tickets-list" class="list-group list-group-flush" style="max-height: 560px; overflow-y: auto;">
+                                        <!-- Tickets will be dynamically inserted here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-8">
+                            <div id="ticket-details" class="d-none">
+                                <!-- Ticket Overview -->
+                                <div class="card mb-3">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0" id="ticket-title">Ticket Details</h5>
+                                        <span id="ticket-status-badge" class="badge"></span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <h6 class="text-muted small mb-2">Customer</h6>
+                                                <div id="customer-info"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="text-muted small mb-2">Booking</h6>
+                                                <div id="booking-info"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <h6 class="text-muted small mb-2">Complaint</h6>
+                                            <div id="complaint-info"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Evidence & Findings -->
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">Evidence & Findings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <!-- Customer Evidence Column -->
+                                            <div class="col-md-4">
+                                                <h6 class="fw-semibold mb-3">Customer Evidence</h6>
+                                                
+                                                <!-- Customer photos -->
+                                                <div class="mb-4">
+                                                    <label class="form-label small text-muted mb-2">Customer photos</label>
+                                                    <div id="customer-images" class="evidence-list mb-2"></div>
+                                                    <div class="d-flex gap-2 mb-2 flex-wrap">
+                                                        <input type="file" class="form-control form-control-sm" accept="image/*" id="ci-file" style="flex: 1; min-width: 120px;">
+                                                        <input type="datetime-local" class="form-control form-control-sm" id="ci-time" placeholder="ISO time" style="width: 150px;">
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="addEvidence('image', 'complaint.images')">Add Image</button>
+                                                </div>
+
+                                                <!-- Customer videos -->
+                                                <div>
+                                                    <label class="form-label small text-muted mb-2">Customer videos</label>
+                                                    <div id="customer-videos" class="evidence-list mb-2"></div>
+                                                    <div class="d-flex gap-2 mb-2 flex-wrap">
+                                                        <input type="file" class="form-control form-control-sm" accept="video/*" id="cv-file" style="flex: 1; min-width: 120px;">
+                                                        <input type="datetime-local" class="form-control form-control-sm" id="cv-time" placeholder="ISO time" style="width: 150px;">
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="addEvidence('video', 'complaint.videos')">Add Video</button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Supporting Evidence Column -->
+                                            <div class="col-md-4">
+                                                <h6 class="fw-semibold mb-3">Supporting Evidence</h6>
+                                                
+                                                <!-- Supporting photos -->
+                                                <div class="mb-4">
+                                                    <label class="form-label small text-muted mb-2">Supporting photos</label>
+                                                    <div id="supporting-images" class="evidence-list mb-2"></div>
+                                                    <div class="d-flex gap-2 mb-2 flex-wrap">
+                                                        <input type="file" class="form-control form-control-sm" accept="image/*" id="si-file" style="flex: 1; min-width: 120px;">
+                                                        <input type="datetime-local" class="form-control form-control-sm" id="si-time" placeholder="ISO time" style="width: 150px;">
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="addEvidence('image', 'admin.supportingImages')">Add Image</button>
+                                                </div>
+
+                                                <!-- Supporting videos -->
+                                                <div>
+                                                    <label class="form-label small text-muted mb-2">Supporting videos</label>
+                                                    <div id="supporting-videos" class="evidence-list mb-2"></div>
+                                                    <div class="d-flex gap-2 mb-2 flex-wrap">
+                                                        <input type="file" class="form-control form-control-sm" accept="video/*" id="sv-file" style="flex: 1; min-width: 120px;">
+                                                        <input type="datetime-local" class="form-control form-control-sm" id="sv-time" placeholder="ISO time" style="width: 150px;">
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="addEvidence('video', 'admin.supportingVideos')">Add Video</button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Supporting Documents Column -->
+                                            <div class="col-md-4">
+                                                <h6 class="fw-semibold mb-3">Supporting Documents</h6>
+                                                
+                                                <!-- Supporting documents -->
+                                                <div>
+                                                    <label class="form-label small text-muted mb-2">Documents</label>
+                                                    <div id="supporting-docs" class="evidence-list mb-2"></div>
+                                                    <div class="d-flex gap-2 mb-2 flex-wrap">
+                                                        <input type="file" class="form-control form-control-sm" accept=".pdf,.doc,.docx" id="sd-file" style="flex: 1; min-width: 200px;">
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="addEvidence('doc', 'admin.supportingDocs')">Add Document</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Our Findings -->
+                                        <div class="mt-4 pt-3 border-top">
+                                            <label for="findings-text" class="form-label small text-muted mb-2">Our findings</label>
+                                            <textarea id="findings-text" class="form-control" rows="4" placeholder="Write objective findings here"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Outcome & Decision -->
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">Outcome & Decision</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-md-6">
+                                                <label for="decision-select" class="form-label small text-muted">Decision</label>
+                                                <select id="decision-select" class="form-select">
+                                                    <option value="Resolved">Resolved</option>
+                                                    <option value="Repair Scheduled">Repair Scheduled</option>
+                                                    <option value="Awaiting Customer">Awaiting Customer</option>
+                                                    <option value="Investigating">Investigating</option>
+                                                    <option value="Rejected">Rejected</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="solution-text" class="form-label small text-muted">Solution summary</label>
+                                                <input type="text" id="solution-text" class="form-control" placeholder="e.g., Mobile repair visit, 120 goodwill">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="reject-reason" class="form-label small text-muted">Reject reason required if rejected</label>
+                                            <input type="text" id="reject-reason" class="form-control" placeholder="e.g., Damage pre existing based on time stamped photos">
+                                        </div>
+
+                                        <div class="d-flex gap-4 mb-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="false-claim-flag">
+                                                <label class="form-check-label" for="false-claim-flag">Flag as false claim</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="liability-accepted">
+                                                <label class="form-check-label" for="liability-accepted">Liability accepted</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setTicketStatus('Investigating')">Mark investigating</button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setTicketStatus('Awaiting Customer')">Awaiting customer</button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setTicketStatus('Repair Scheduled')">Repair scheduled</button>
+                                            <button type="button" class="btn btn-success btn-sm px-4" onclick="setTicketStatus('Resolved')">Resolve</button>
+                                            <button type="button" class="btn btn-danger btn-sm px-4" onclick="setTicketStatus('Rejected')">Reject</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Repair & Scheduling -->
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">Repair & Scheduling</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-md-4">
+                                                <label for="repairer" class="form-label small">Repairer</label>
+                                                <input type="text" id="repairer" class="form-control" placeholder="Repairer name">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="claim-amount" class="form-label small">Claim amount (£)</label>
+                                                <input type="number" id="claim-amount" class="form-control" placeholder="0">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="timeframe-days" class="form-label small">Timeframe (days)</label>
+                                                <input type="number" id="timeframe-days" class="form-control" placeholder="0">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="scheduled-date" class="form-label small">Scheduled date</label>
+                                                <input type="date" id="scheduled-date" class="form-control">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="scheduled-window" class="form-label small">Time window</label>
+                                                <input type="text" id="scheduled-window" class="form-control" placeholder="e.g., 09:00-12:00">
+                                            </div>
+                                        </div>
+
+                                        <div id="customer-scheduling" class="d-none">
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-md-4">
+                                                    <label for="preferred-time" class="form-label small">Customer preferred time</label>
+                                                    <input type="time" id="preferred-time" class="form-control">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-check mt-4">
+                                                        <input class="form-check-input" type="checkbox" id="parking-available">
+                                                        <label class="form-check-label" for="parking-available">Parking available</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-check mt-4">
+                                                        <input class="form-check-input" type="checkbox" id="power-available">
+                                                        <label class="form-check-label" for="power-available">Power available</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Audit Log -->
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">Audit Log</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="audit-log" class="small text-muted" style="max-height: 180px; overflow-y: auto;">
+                                            <!-- Audit entries will be dynamically inserted here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- No ticket selected message -->
+                            <div id="no-ticket-selected" class="card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-ticket-detailed-fill text-muted" style="font-size: 3rem;"></i>
+                                    <h5 class="mt-3 text-muted">No ticket selected</h5>
+                                    <p class="text-muted">Select a ticket from the list on the left to view details.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports Tab -->
+                <section id="reports-tab" class="tab-content d-none">
+                    <div class="card border-0">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="card-title mb-0">Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <div class="card report-card h-100">
+                                        <div class="card-body">
+                                            <small class="text-muted d-block mb-2">Open</small>
+                                            <h3 class="fw-bold mb-0" id="report-open">1</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="card report-card h-100">
+                                        <div class="card-body">
+                                            <small class="text-muted d-block mb-2">Resolved</small>
+                                            <h3 class="fw-bold mb-0" id="report-resolved">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="card report-card h-100">
+                                        <div class="card-body">
+                                            <small class="text-muted d-block mb-2">Rejected</small>
+                                            <h3 class="fw-bold mb-0" id="report-rejected">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="card report-card h-100">
+                                        <div class="card-body">
+                                            <small class="text-muted d-block mb-2">Avg claim £</small>
+                                            <h3 class="fw-bold mb-0" id="report-avg-claim">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Tab -->
+                <section id="settings-tab" class="tab-content d-none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-dark small mb-0">Later: SLA targets, auto emails, template texts for receipts.</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Self Tests -->
+            <section class="mt-4">
+                <div class="card" id="self-tests-card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">Self Tests</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="test-results">
+                            <small class="text-muted">Running tests...</small>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="notification-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i id="toast-icon" class="bi bi-check-circle-fill text-success me-2"></i>
+                <strong id="toast-title" class="me-auto">Success</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toast-message">
+                <!-- Toast message content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

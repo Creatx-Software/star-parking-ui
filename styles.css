@@ -1,0 +1,510 @@
+/* Custom CSS for Complaints & Claims Desk */
+
+/* Global Styles */
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --muted-color: #6c757d;
+    --border-color: #dee2e6;
+    --border-radius: 0.75rem;
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Base styles */
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    background-color: #f8fafc;
+}
+
+/* Cards */
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: calc(var(--border-radius) - 1px) calc(var(--border-radius) - 1px) 0 0;
+}
+
+/* Card Titles */
+.card-title {
+    font-size: 0.875rem !important;
+}
+
+/* Buttons */
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-sm {
+    border-radius: calc(var(--border-radius) * 0.75);
+}
+
+/* Override blue buttons to black */
+.btn-outline-primary {
+    color: #000000;
+    border-color: #000000;
+}
+
+.btn-outline-primary:hover {
+    color: #ffffff;
+    background-color: #000000;
+    border-color: #000000;
+}
+
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    color: #ffffff;
+    background-color: #000000;
+    border-color: #000000;
+}
+
+/* Outcome & Decision Section Buttons */
+.btn-outline-secondary {
+    color: #000000;
+    background-color: #ffffff;
+    border-color: #dee2e6;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.btn-outline-secondary:hover {
+    color: #000000;
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.btn-success,
+.btn-danger {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* Report Cards */
+#reports-tab > .card {
+    border-radius: 0.75rem;
+}
+
+#reports-tab > .card .card-header {
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+/* Settings Card */
+#settings-tab > .card {
+    border-radius: 0.75rem;
+}
+
+#settings-tab > .card .card-header {
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.report-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow: none !important;
+}
+
+.report-card .card-body {
+    padding: 1rem 1.25rem;
+}
+
+.report-card small {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.report-card h3 {
+    font-size: 1.75rem;
+    color: #000000;
+    line-height: 1;
+}
+
+/* Form Controls */
+.form-control,
+.form-select {
+    border-radius: 0.5rem;
+    border: 2px solid var(--border-color);
+    transition: border-color 0.15s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--dark-color);
+    box-shadow: none;
+}
+
+.form-control-sm {
+    border-radius: calc(var(--border-radius) * 0.75);
+}
+
+/* File Input Styling */
+.form-control[type="file"] {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.form-control[type="file"]::file-selector-button {
+    padding: 0.25rem 0.75rem;
+    margin: -0.375rem -0.75rem;
+    margin-inline-end: 0.75rem;
+    color: var(--dark-color);
+    background-color: var(--light-color);
+    border: 0;
+    border-inline-end: 2px solid var(--border-color);
+    border-radius: 0;
+    transition: all 0.15s ease-in-out;
+}
+
+.form-control[type="file"]:hover:not(:disabled):not([readonly])::file-selector-button {
+    background-color: #e9ecef;
+}
+
+/* Badge Pills */
+.badge {
+    font-size: 0.75em;
+    font-weight: 500;
+    border-radius: 50rem;
+    padding: 0.35em 0.65em;
+}
+
+.badge.bg-light {
+    color: var(--dark-color);
+    background-color: var(--light-color) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning-color) !important;
+    color: var(--dark-color);
+}
+
+.badge.bg-danger {
+    background-color: var(--danger-color) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--info-color) !important;
+    color: var(--dark-color);
+}
+
+/* Status-specific badge colors */
+.badge.status-new { background-color: #6366f1 !important; color: white; }
+.badge.status-triage { background-color: #f1f5f9 !important; color: #354157; }
+.badge.status-investigating { background-color: #3b82f6 !important; color: white; }
+.badge.status-awaiting { background-color: #f59e0b !important; color: white; }
+.badge.status-repair { background-color: #06b6d4 !important; color: white; }
+.badge.status-resolved { background-color: #10b981 !important; color: white; }
+.badge.status-rejected { background-color: #ef4444 !important; color: white; }
+
+/* Tab Content */
+.tab-content {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tickets List */
+.tickets-list-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    cursor: pointer;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.tickets-list-item.active {
+    border-color: #e5e7eb;
+    background-color: white;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Evidence List */
+.evidence-list {
+    max-height: 160px;
+    overflow-y: auto;
+}
+
+.evidence-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.375rem;
+    background-color: #f5f5f5;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.evidence-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Damage Type Pills */
+.damage-type-pill {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    margin: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #4b5563;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+}
+
+/* Customer Info List */
+.customer-info-list {
+    list-style: disc;
+    padding-left: 1.2rem;
+    margin-bottom: 0;
+}
+
+.customer-info-list li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--dark-color);
+}
+
+.customer-info-list li:last-child {
+    margin-bottom: 0;
+}
+
+/* Self Tests Card - No Shadow */
+#self-tests-card {
+    box-shadow: none !important;
+}
+
+/* Toast Styling */
+.toast {
+    border-radius: var(--border-radius);
+}
+
+/* Audit Log */
+.audit-entry {
+    font-size: 0.875rem;
+    color: var(--muted-color);
+    margin-bottom: 0.25rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(var(--bs-light-rgb), 0.5);
+}
+
+.audit-entry:last-child {
+    border-bottom: none;
+}
+
+/* Form Validation */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: var(--danger-color);
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-group .btn {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .evidence-list {
+        max-height: 120px;
+    }
+    
+    .tickets-list-item {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .h2 {
+        font-size: 1.5rem;
+    }
+    
+    .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .btn-sm {
+        font-size: 0.8125rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .evidence-item {
+        padding: 0.375rem;
+    }
+    
+    .damage-type-pill {
+        font-size: 0.6875rem;
+        padding: 0.125rem 0.375rem;
+    }
+}
+
+/* Accessibility improvements */
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25);
+}
+
+.btn:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.5);
+}
+
+/* Print styles */
+@media print {
+    .btn,
+    .toast-container,
+    #tab-selector,
+    #search-input {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    .page-break {
+        page-break-before: always;
+    }
+}
+
+/* Custom scrollbar for webkit browsers */
+.evidence-list::-webkit-scrollbar,
+#tickets-list::-webkit-scrollbar,
+#audit-log::-webkit-scrollbar {
+    width: 6px;
+}
+
+.evidence-list::-webkit-scrollbar-track,
+#tickets-list::-webkit-scrollbar-track,
+#audit-log::-webkit-scrollbar-track {
+    background: var(--light-color);
+    border-radius: 3px;
+}
+
+.evidence-list::-webkit-scrollbar-thumb,
+#tickets-list::-webkit-scrollbar-thumb,
+#audit-log::-webkit-scrollbar-thumb {
+    background: var(--muted-color);
+    border-radius: 3px;
+}
+
+.evidence-list::-webkit-scrollbar-thumb:hover,
+#tickets-list::-webkit-scrollbar-thumb:hover,
+#audit-log::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-color);
+}
+
+/* Error boundary styles */
+#error-boundary {
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+#error-boundary pre {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Animation for status changes */
+.status-change-animation {
+    animation: statusPulse 0.6s ease-in-out;
+}
+
+@keyframes statusPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Focus ring for better accessibility */
+.focus-ring:focus {
+    outline: 2px solid var(--dark-color);
+    outline-offset: 2px;
+}
+
+/* Utility classes */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.text-truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.transition-all {
+    transition: all 0.15s ease-in-out;
+}
+
+/* Dark mode support (if needed in the future) */
+@media (prefers-color-scheme: dark) {
+    /* Dark mode styles would go here */
+}
+
+.list-group-item.list-group-item-action.tickets-list-item.active {
+    margin-top: 10px;
+    width: 95%;
+    border: 1px solid black;
+    align-self: center;
+    border-radius: 15px;
+}
