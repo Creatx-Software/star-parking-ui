@@ -1224,10 +1224,10 @@ class MessagingBackend {
     }
 
     initializeEventListeners() {
-        // Customer selection
-        document.querySelectorAll('.customer-item').forEach(item => {
+        // Customer selection - scope to messaging backend only
+        document.querySelectorAll('#messaging-backend .customer-item').forEach(item => {
             item.addEventListener('click', (e) => {
-                document.querySelectorAll('.customer-item').forEach(c => c.classList.remove('selected'));
+                document.querySelectorAll('#messaging-backend .customer-item').forEach(c => c.classList.remove('selected'));
                 item.classList.add('selected');
                 
                 // Update live thread with selected customer
@@ -1280,12 +1280,12 @@ class MessagingBackend {
             plainTextInput.addEventListener('input', () => this.updatePreview());
         }
 
-        // Search functionality
+        // Search functionality - scope to messaging backend only
         const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
+        if (searchInput && document.getElementById('messaging-backend')) {
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.toLowerCase();
-                document.querySelectorAll('.customer-item').forEach(item => {
+                document.querySelectorAll('#messaging-backend .customer-item').forEach(item => {
                     const name = item.querySelector('.fw-medium').textContent.toLowerCase();
                     const phone = item.querySelector('.text-muted').textContent.toLowerCase();
                     
@@ -1467,7 +1467,7 @@ class MessagingBackend {
         if (!customer || !conversation) return;
         
         // Update the customer badge in live thread header
-        const customerBadge = document.querySelector('.card-body h6 + .badge');
+        const customerBadge = document.querySelector('#messaging-backend .card-body h6 + .badge');
         if (customerBadge) {
             customerBadge.textContent = customer.name;
         }
