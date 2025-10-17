@@ -1123,3 +1123,385 @@ document.addEventListener('DOMContentLoaded', function() {
         ErrorBoundary.showError(error);
     }
 });
+
+// ===== MESSAGING BACKEND FUNCTIONALITY =====
+// Additional functionality for messaging control room interface
+
+// Messaging Backend Class
+class MessagingBackend {
+    constructor() {
+        // Customer data
+        this.customers = {
+            c1: { id: "c1", name: "John Hamilton", phone: "+447700900001" },
+            c2: { id: "c2", name: "Sarah Malik", phone: "+447700900002" },
+            c3: { id: "c3", name: "Adam Brown", phone: "+447700900003" }
+        };
+
+        // Conversation data for each customer
+        this.conversations = {
+            c1: [
+                { type: "received", text: "Hello, I am ready at bay B" },
+                { type: "sent", text: "Thanks John, five mins please" },
+                { type: "received", text: "Sure" }
+            ],
+            c2: [
+                { type: "received", text: "Hi, where should I wait?" },
+                { type: "sent", text: "Hi Sarah, please wait at Terminal 2 pickup area" },
+                { type: "received", text: "Got it, thanks!" }
+            ],
+            c3: [
+                { type: "received", text: "There's a small scratch on my car" },
+                { type: "sent", text: "Please share a picture of the mark. We will arrange repair." },
+                { type: "received", text: "Sending photo now" }
+            ]
+        };
+
+        // Template data
+        this.templates = {
+            t1: {
+                name: "Arrival pick up",
+                channel: "whatsapp",
+                body: "Hi {{name}}, welcome back. Your car is ready at bay B. Reply 1 for five mins, 2 for ten mins.",
+                variables: ["name"]
+            },
+            t2: {
+                name: "Delay notice", 
+                channel: "sms",
+                body: "Hi {{name}}, we are running a few mins behind due to traffic at {{terminal}}. We will update you shortly.",
+                variables: ["name", "terminal"]
+            },
+            t3: {
+                name: "Review request",
+                channel: "sms", 
+                body: "Thanks {{name}} for using Star Parking. Share your experience here: {{short_link}}",
+                variables: ["name", "short_link"]
+            }
+        };
+
+        // Variables state
+        this.variables = { name: "", terminal: "", short_link: "" };
+
+        // Calendar state
+        this.currentCalendarDate = new Date();
+        this.selectedDate = null;
+
+        // DOM elements
+        this.templateSelect = null;
+        this.templateVariables = null;
+        this.plainTextArea = null;
+        this.previewText = null;
+        this.previewLength = null;
+        this.clearTemplateBtn = null;
+        this.scheduleSwitch = null;
+        this.scheduleCalendar = null;
+        this.abTestSwitch = null;
+        this.defineVariants = null;
+    }
+
+    init() {
+        // Only initialize if we're on the messaging page
+        if (!document.getElementById('templateSelect')) {
+            return;
+        }
+
+        this.initializeDOMElements();
+        this.initializeEventListeners();
+        this.initializeCalendar();
+        this.updateTemplate('t1');
+    }
+
+    initializeDOMElements() {
+        this.templateSelect = document.getElementById('templateSelect');
+        this.templateVariables = document.getElementById('templateVariables');
+        this.plainTextArea = document.getElementById('plainTextArea');
+        this.previewText = document.getElementById('previewText');
+        this.previewLength = document.getElementById('previewLength');
+        this.clearTemplateBtn = document.getElementById('clearTemplate');
+        this.scheduleSwitch = document.getElementById('scheduleSwitch');
+        this.scheduleCalendar = document.getElementById('scheduleCalendar');
+        this.abTestSwitch = document.getElementById('abTestSwitch');
+        this.defineVariants = document.getElementById('defineVariants');
+    }
+
+    initializeEventListeners() {
+        // Customer selection
+        document.querySelectorAll('.customer-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                document.querySelectorAll('.customer-item').forEach(c => c.classList.remove('selected'));
+                item.classList.add('selected');
+                
+                // Update live thread with selected customer
+                const customerId = item.dataset.customer;
+                this.updateLiveThread(customerId);
+            });
+        });
+
+        // Template selection
+        if (this.templateSelect) {
+            this.templateSelect.addEventListener('change', (e) => {
+                const templateId = e.target.value;
+                this.updateTemplate(templateId);
+            });
+        }
+
+        // Clear template
+        if (this.clearTemplateBtn) {
+            this.clearTemplateBtn.addEventListener('click', () => {
+                this.templateSelect.value = '';
+                this.updateTemplate('');
+            });
+        }
+
+        // Schedule switch
+        if (this.scheduleSwitch) {
+            this.scheduleSwitch.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    this.scheduleCalendar.classList.remove('d-none');
+                } else {
+                    this.scheduleCalendar.classList.add('d-none');
+                }
+            });
+        }
+
+        // A/B Test switch
+        if (this.abTestSwitch) {
+            this.abTestSwitch.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    this.defineVariants.classList.remove('d-none');
+                } else {
+                    this.defineVariants.classList.add('d-none');
+                }
+            });
+        }
+
+        // Plain text input
+        const plainTextInput = document.getElementById('plainText');
+        if (plainTextInput) {
+            plainTextInput.addEventListener('input', () => this.updatePreview());
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                document.querySelectorAll('.customer-item').forEach(item => {
+                    const name = item.querySelector('.fw-medium').textContent.toLowerCase();
+                    const phone = item.querySelector('.text-muted').textContent.toLowerCase();
+                    
+                    if (name.includes(query) || phone.includes(query.replace(/\s/g, ''))) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+    }
+
+    updateTemplate(templateId) {
+        if (templateId && this.templates[templateId]) {
+            const template = this.templates[templateId];
+            
+            // Show template variables, hide plain text
+            this.templateVariables.classList.remove('d-none');
+            this.plainTextArea.classList.add('d-none');
+            
+            // Update variables inputs
+            const variablesHtml = template.variables.map(variable => `
+                <div class="col-4">
+                    <div class="text-xs text-muted">${variable}</div>
+                    <input type="text" class="form-control variable-input" 
+                           placeholder="Value for ${variable}" 
+                           data-variable="${variable}"
+                           value="${this.variables[variable] || ''}">
+                </div>
+            `).join('');
+            
+            const variablesRow = this.templateVariables.querySelector('.row');
+            if (variablesRow) {
+                variablesRow.innerHTML = variablesHtml;
+            }
+            
+            // Add event listeners to variable inputs
+            document.querySelectorAll('.variable-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    this.variables[e.target.dataset.variable] = e.target.value;
+                    this.updatePreview();
+                });
+            });
+            
+            this.updatePreview();
+        } else {
+            // Show plain text, hide template variables
+            this.templateVariables.classList.add('d-none');
+            this.plainTextArea.classList.remove('d-none');
+            this.updatePreview();
+        }
+    }
+
+    updatePreview() {
+        const templateId = this.templateSelect ? this.templateSelect.value : '';
+        let text = '';
+        
+        if (templateId && this.templates[templateId]) {
+            text = this.templates[templateId].body;
+            // Replace variables
+            Object.entries(this.variables).forEach(([key, value]) => {
+                text = text.replaceAll(`{{${key}}}`, value || `{{${key}}}`);
+            });
+        } else {
+            const plainTextInput = document.getElementById('plainText');
+            text = plainTextInput ? plainTextInput.value || 'Your text will appear here' : 'Your text will appear here';
+        }
+        
+        if (this.previewText) {
+            this.previewText.textContent = text;
+        }
+        if (this.previewLength) {
+            this.previewLength.textContent = text.length;
+        }
+    }
+
+    initializeCalendar() {
+        this.renderCalendar();
+        
+        // Month navigation
+        const prevBtn = document.getElementById('prevMonth');
+        const nextBtn = document.getElementById('nextMonth');
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                this.currentCalendarDate.setMonth(this.currentCalendarDate.getMonth() - 1);
+                this.renderCalendar();
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                this.currentCalendarDate.setMonth(this.currentCalendarDate.getMonth() + 1);
+                this.renderCalendar();
+            });
+        }
+    }
+
+    renderCalendar() {
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const currentMonth = this.currentCalendarDate.getMonth();
+        const currentYear = this.currentCalendarDate.getFullYear();
+        
+        // Update month display
+        const currentMonthElement = document.getElementById('currentMonth');
+        if (currentMonthElement) {
+            currentMonthElement.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        }
+        
+        // Get first day of month and number of days
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDayOfWeek = firstDay.getDay();
+        
+        // Get today's date for highlighting
+        const today = new Date();
+        const isCurrentMonth = today.getFullYear() === currentYear && today.getMonth() === currentMonth;
+        
+        const calendarDates = document.getElementById('calendarDates');
+        if (!calendarDates) return;
+        
+        calendarDates.innerHTML = '';
+        
+        // Add empty cells for days before the month starts
+        for (let i = 0; i < startingDayOfWeek; i++) {
+            const prevMonthDay = new Date(currentYear, currentMonth, 0 - (startingDayOfWeek - 1 - i));
+            const dayElement = this.createDateElement(prevMonthDay.getDate(), 'other-month');
+            calendarDates.appendChild(dayElement);
+        }
+        
+        // Add days of the current month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayElement = this.createDateElement(day);
+            
+            // Highlight today
+            if (isCurrentMonth && day === today.getDate()) {
+                dayElement.classList.add('today');
+            }
+            
+            // Add click event
+            dayElement.addEventListener('click', () => {
+                // Remove previous selection
+                document.querySelectorAll('.calendar-date.selected').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                
+                // Select this date
+                dayElement.classList.add('selected');
+                this.selectedDate = new Date(currentYear, currentMonth, day);
+            });
+            
+            calendarDates.appendChild(dayElement);
+        }
+        
+        // Fill remaining cells to complete exactly 6 weeks (42 days)
+        const totalCells = calendarDates.children.length;
+        const remainingCells = 42 - totalCells;
+        for (let i = 1; i <= remainingCells; i++) {
+            const nextMonthDay = this.createDateElement(i, 'other-month');
+            calendarDates.appendChild(nextMonthDay);
+        }
+    }
+
+    createDateElement(day, className = '') {
+        const dayElement = document.createElement('div');
+        dayElement.className = `calendar-date ${className}`;
+        dayElement.textContent = day;
+        return dayElement;
+    }
+
+    updateLiveThread(customerId) {
+        const customer = this.customers[customerId];
+        const conversation = this.conversations[customerId];
+        
+        if (!customer || !conversation) return;
+        
+        // Update the customer badge in live thread header
+        const customerBadge = document.querySelector('.card-body h6 + .badge');
+        if (customerBadge) {
+            customerBadge.textContent = customer.name;
+        }
+        
+        // Update the conversation messages
+        const liveThread = document.getElementById('liveThread');
+        if (!liveThread) return;
+        
+        liveThread.innerHTML = '';
+        
+        conversation.forEach(message => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `d-flex justify-content-${message.type === 'sent' ? 'end' : 'start'} mb-2`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = `message-bubble-${message.type} p-2`;
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text-sm';
+            textDiv.textContent = message.text;
+            
+            bubbleDiv.appendChild(textDiv);
+            messageDiv.appendChild(bubbleDiv);
+            liveThread.appendChild(messageDiv);
+        });
+    }
+}
+
+// Initialize messaging backend when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Only initialize messaging backend if we're on the messaging page
+    if (document.getElementById('templateSelect')) {
+        window.messagingBackend = new MessagingBackend();
+        window.messagingBackend.init();
+        console.log('Messaging Backend initialized successfully');
+    }
+});
