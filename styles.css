@@ -973,3 +973,230 @@ body {
         font-size: 0.65rem !important;
     }
 }
+
+/* ===== PLATE SCANNER STYLES ===== */
+/* Light theme styles for plate scanner interface */
+
+/* Plate Scanner specific body styles */
+#plate-scanner {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Plate display styling */
+#plate-scanner .plate-display {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #1a1a1a;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 2px solid #e6c200;
+    text-align: center;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+}
+
+/* Scan log styling */
+#plate-scanner .scan-log {
+    height: 200px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+#plate-scanner .scan-log div {
+    padding: 2px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+#plate-scanner .scan-log div:last-child {
+    border-bottom: none;
+}
+
+/* Booking result styling */
+#plate-scanner .booking-result {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 20px;
+    background-color: #ffffff;
+    min-height: 150px;
+}
+
+#plate-scanner .booking-result.success {
+    border-color: #198754;
+    background-color: #f8fff9;
+}
+
+#plate-scanner .booking-result.warning {
+    border-color: #ffc107;
+    background-color: #fffdf0;
+}
+
+/* API example styling */
+#plate-scanner .api-example pre {
+    font-size: 0.85rem;
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+/* Card styling for plate scanner */
+#plate-scanner .card {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease;
+}
+
+#plate-scanner .card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Button styling */
+#plate-scanner .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    font-weight: 500;
+}
+
+#plate-scanner .btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+#plate-scanner .btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+}
+
+#plate-scanner .btn-outline-secondary:hover {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+/* Form controls */
+#plate-scanner .form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#plate-scanner .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+#plate-scanner .form-select {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+#plate-scanner .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+/* Badge styling */
+#plate-scanner .badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+#plate-scanner .badge.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+/* Permission state badges */
+#plate-scanner .badge.permission-granted {
+    background-color: #198754 !important;
+    color: white !important;
+}
+
+#plate-scanner .badge.permission-denied {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+#plate-scanner .badge.permission-prompt {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+/* Alert styling */
+#plate-scanner .alert {
+    border-radius: 8px;
+}
+
+/* Video styling */
+#plate-scanner video {
+    border-radius: 8px;
+    background-color: #000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #plate-scanner .plate-display {
+        font-size: 1rem;
+        letter-spacing: 2px;
+        padding: 8px 16px;
+    }
+    
+    #plate-scanner .scan-log {
+        height: 150px;
+    }
+    
+    #plate-scanner .d-flex.flex-wrap.gap-2 {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    #plate-scanner .d-flex.flex-wrap.gap-2 .form-check {
+        align-self: flex-start;
+    }
+}
+
+/* Success/Warning states for booking results */
+#plate-scanner .booking-success {
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+    color: #0f5132;
+}
+
+#plate-scanner .booking-warning {
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+    color: #664d03;
+}
+
+/* Loading state */
+#plate-scanner .loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+#plate-scanner .loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #0d6efd;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

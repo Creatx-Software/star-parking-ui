@@ -1504,4 +1504,506 @@ document.addEventListener('DOMContentLoaded', () => {
         window.messagingBackend.init();
         console.log('Messaging Backend initialized successfully');
     }
+    
+    // Initialize plate scanner if we're on the plate scanner page
+    if (document.getElementById('plate-scanner')) {
+        window.plateScanner = new PlateScanner();
+        window.plateScanner.init();
+        console.log('Plate Scanner initialized successfully');
+    }
 });
+
+// ===== PLATE SCANNER FUNCTIONALITY =====
+// Plate scanner with OCR and booking lookup functionality
+
+class PlateScanner {
+    constructor() {
+        // DOM elements
+        this.video = null;
+        this.frame = null;
+        this.startBtn = null;
+        this.stopBtn = null;
+        this.cameraSelect = null;
+        this.autoCapture = null;
+        this.intervalEl = null;
+        this.confidenceEl = null;
+        this.lastPlateEl = null;
+        this.manualPlate = null;
+        this.lookupBtn = null;
+        this.logEl = null;
+        this.bookingBox = null;
+        this.envWarn = null;
+        this.envWarnText = null;
+        this.permState = null;
+        this.fileInput = null;
+        this.testOutput = null;
+        this.mockToggle = null;
+
+        // State
+        this.stream = null;
+        this.timer = null;
+        this.worker = null;
+
+        // UK plate regex patterns
+        this.UK_REGEXES = [
+            /\b([A-Z]{2}\d{2}\s?[A-Z]{3})\b/g,              // current format
+            /\b([A-Z]{1,3}\d{1,4}\s?[A-Z]{1,3})\b/g,         // cherished formats
+        ];
+    }
+
+    init() {
+        // Only initialize if we're on the plate scanner page
+        if (!document.getElementById('plate-scanner')) {
+            return;
+        }
+
+        this.initializeDOMElements();
+        this.initializeEventListeners();
+        this.showEnvWarnings();
+        this.updatePermissionState();
+        this.runTests();
+    }
+
+    initializeDOMElements() {
+        this.video = document.getElementById('video');
+        this.frame = document.getElementById('frame');
+        this.startBtn = document.getElementById('startBtn');
+        this.stopBtn = document.getElementById('stopBtn');
+        this.cameraSelect = document.getElementById('cameraSelect');
+        this.autoCapture = document.getElementById('autoCapture');
+        this.intervalEl = document.getElementById('interval');
+        this.confidenceEl = document.getElementById('confidence');
+        this.lastPlateEl = document.getElementById('lastPlate');
+        this.manualPlate = document.getElementById('manualPlate');
+        this.lookupBtn = document.getElementById('lookupBtn');
+        this.logEl = document.getElementById('log');
+        this.bookingBox = document.getElementById('bookingBox');
+        this.envWarn = document.getElementById('envWarn');
+        this.envWarnText = document.getElementById('envWarnText');
+        this.permState = document.getElementById('permState');
+        this.fileInput = document.getElementById('fileInput');
+        this.testOutput = document.getElementById('testOutput');
+        this.mockToggle = document.getElementById('mockToggle');
+    }
+
+    initializeEventListeners() {
+        // Camera controls
+        if (this.startBtn) {
+            this.startBtn.addEventListener('click', () => this.startCamera());
+        }
+
+        if (this.stopBtn) {
+            this.stopBtn.addEventListener('click', () => this.stopCamera());
+        }
+
+        if (this.cameraSelect) {
+            this.cameraSelect.addEventListener('change', () => {
+                if (this.stream) {
+                    this.stopCamera();
+                    this.startCamera();
+                }
+            });
+        }
+
+        if (this.intervalEl) {
+            this.intervalEl.addEventListener('change', () => {
+                if (this.timer) {
+                    this.scheduleScan();
+                }
+            });
+        }
+
+        if (this.autoCapture) {
+            this.autoCapture.addEventListener('change', () => {
+                if (this.autoCapture.checked) {
+                    this.scheduleScan();
+                } else if (this.timer) {
+                    clearTimeout(this.timer);
+                    this.timer = null;
+                }
+            });
+        }
+
+        // Manual lookup
+        if (this.lookupBtn) {
+            this.lookupBtn.addEventListener('click', () => {
+                const val = this.manualPlate.value.trim().toUpperCase().replace(/\s/g, '');
+                if (!val) return;
+                this.lastPlateEl.textContent = val.replace(/(.{2})(.{2})(.{3})/, '$1$2 $3');
+                this.lookupByReg(val);
+            });
+        }
+
+        // File upload
+        if (this.fileInput) {
+            this.fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                try {
+                    const bmp = await createImageBitmap(file);
+                    const data = await this.doOCRFromImageBitmap(bmp);
+                    this.handleOCRResult(data);
+                } catch (error) {
+                    this.log('Error processing uploaded image: ' + error.message);
+                }
+            });
+        }
+    }
+
+    normalisePlate(text) {
+        if (!text) return null;
+        let t = text.toUpperCase()
+            .replace(/\n/g, ' ')
+            .replace(/[^A-Z0-9 ]/g, '')
+            .replace(/O/g, '0');
+        
+        for (const re of this.UK_REGEXES) {
+            const matches = [...t.matchAll(re)].map(m => m[1].replace(/\s/g, ''));
+            if (matches.length) {
+                const best = matches.sort((a, b) => Math.abs(7 - a.length) - Math.abs(7 - b.length))[0];
+                return best;
+            }
+        }
+        return null;
+    }
+
+    log(msg) {
+        if (!this.logEl) return;
+        const div = document.createElement('div');
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        this.logEl.prepend(div);
+    }
+
+    showEnvWarnings() {
+        if (!this.envWarn || !this.envWarnText) return;
+        
+        const issues = [];
+        if (!window.isSecureContext) {
+            issues.push('This page is not on HTTPS or localhost. Browsers block camera on insecure origins.');
+        }
+        if (!('mediaDevices' in navigator)) {
+            issues.push('This browser does not support media devices.');
+        }
+        if (document.visibilityState !== 'visible') {
+            issues.push('Tab is not active.');
+        }
+        
+        if (issues.length) {
+            this.envWarn.classList.remove('d-none');
+            this.envWarnText.innerHTML = issues.map(i => `• ${i}`).join('<br>');
+            this.log('Environment warning: ' + issues.join(' | '));
+        } else {
+            this.envWarn.classList.add('d-none');
+        }
+    }
+
+    async updatePermissionState() {
+        if (!this.permState) return;
+        
+        try {
+            if (!navigator.permissions) {
+                this.permState.textContent = 'permission api n/a';
+                return;
+            }
+            
+            const permission = await navigator.permissions.query({ name: 'camera' });
+            const updateState = () => {
+                this.permState.textContent = 'camera ' + permission.state;
+                this.permState.className = 'badge ' + (
+                    permission.state === 'granted' ? 'permission-granted' : 
+                    permission.state === 'denied' ? 'permission-denied' : 
+                    'permission-prompt'
+                );
+            };
+            
+            permission.addEventListener('change', updateState);
+            updateState();
+        } catch (error) {
+            this.permState.textContent = 'permission unknown';
+            this.permState.className = 'badge bg-secondary';
+        }
+    }
+
+    async listCameras() {
+        if (!navigator.mediaDevices) return;
+        
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(d => d.kind === 'videoinput');
+            
+            this.cameraSelect.innerHTML = '';
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.textContent = device.label || `Camera ${index + 1}`;
+                this.cameraSelect.appendChild(option);
+            });
+        } catch (error) {
+            this.log('Error listing cameras: ' + error.message);
+        }
+    }
+
+    async startCamera() {
+        this.showEnvWarnings();
+        await this.updatePermissionState();
+        
+        if (!window.isSecureContext) {
+            alert('Browser policy: camera only works on HTTPS or localhost. Use your https domain or run on localhost.');
+            return;
+        }
+        
+        if (!('mediaDevices' in navigator)) {
+            alert('Camera not supported in this browser');
+            return;
+        }
+        
+        try {
+            await this.listCameras();
+            
+            const deviceId = this.cameraSelect.value || undefined;
+            const constraints = {
+                video: deviceId ? 
+                    { deviceId: { exact: deviceId } } : 
+                    { facingMode: { ideal: 'environment' }, resizeMode: 'crop-and-scale' },
+                audio: false
+            };
+            
+            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+            this.video.srcObject = this.stream;
+            await this.video.play();
+            
+            this.startBtn.disabled = true;
+            this.stopBtn.disabled = false;
+            this.log('Camera started');
+            
+            // Initialize OCR worker if not already done
+            if (!this.worker) {
+                this.worker = await Tesseract.createWorker({
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            // Keep quiet during recognition
+                        }
+                    }
+                });
+                await this.worker.loadLanguage('eng');
+                await this.worker.initialize('eng');
+                this.log('OCR ready');
+            }
+            
+            if (this.autoCapture.checked) {
+                this.scheduleScan();
+            }
+        } catch (error) {
+            console.error(error);
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                this.log('Camera permission denied. Use Upload fallback or allow access in browser settings.');
+                alert('Camera permission denied by the browser. Use the Upload option or enable camera access in site settings.');
+            } else if (error.name === 'NotFoundError') {
+                this.log('No camera device found.');
+                alert('No camera device found. Use Upload fallback.');
+            } else {
+                this.log('Camera failed: ' + (error.message || error));
+                alert('Camera failed: ' + (error.message || error));
+            }
+        }
+    }
+
+    stopCamera() {
+        if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+        }
+        
+        if (this.stream) {
+            this.stream.getTracks().forEach(track => track.stop());
+            this.stream = null;
+        }
+        
+        this.startBtn.disabled = false;
+        this.stopBtn.disabled = true;
+        this.log('Camera stopped');
+    }
+
+    scheduleScan() {
+        if (this.timer) clearTimeout(this.timer);
+        const interval = Math.max(300, Number(this.intervalEl.value) || 1500);
+        this.timer = setTimeout(() => this.captureAndRead(), interval);
+    }
+
+    async doOCRFromImageBitmap(bitmap) {
+        if (!this.worker) {
+            this.worker = await Tesseract.createWorker();
+            await this.worker.loadLanguage('eng');
+            await this.worker.initialize('eng');
+        }
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        canvas.getContext('2d').drawImage(bitmap, 0, 0);
+        
+        const { data } = await this.worker.recognize(canvas);
+        return data;
+    }
+
+    async captureAndRead() {
+        if (!this.stream || !this.worker || !this.video) return;
+        
+        const width = 640;
+        const ratio = this.video.videoHeight ? (this.video.videoWidth / this.video.videoHeight) : (16 / 9);
+        const height = Math.round(width / ratio);
+        
+        this.frame.width = width;
+        this.frame.height = height;
+        
+        const ctx = this.frame.getContext('2d');
+        ctx.drawImage(this.video, 0, 0, width, height);
+        
+        try {
+            const { data } = await this.worker.recognize(this.frame);
+            this.handleOCRResult(data);
+        } catch (error) {
+            console.error(error);
+            this.log('OCR error');
+        } finally {
+            if (this.autoCapture.checked) {
+                this.scheduleScan();
+            }
+        }
+    }
+
+    handleOCRResult(data) {
+        const plate = this.normalisePlate(data.text);
+        if (plate) {
+            this.lastPlateEl.textContent = plate.replace(/(.{2})(.{2})(.{3})/, '$1$2 $3');
+            const confidence = Math.round(data.confidence || 55);
+            this.log(`Detected ${plate} conf ${confidence}`);
+            
+            const threshold = Number(this.confidenceEl.value) || 45;
+            if (confidence >= threshold) {
+                this.lookupByReg(plate);
+            }
+        } else {
+            this.log('No plate matched');
+        }
+    }
+
+    async lookupByReg(reg) {
+        try {
+            const url = `/api/bookings?reg=${encodeURIComponent(reg)}`;
+            const response = this.mockToggle.checked ? await this.mockFetch(url) : await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error('No match');
+            }
+            
+            const data = await response.json();
+            this.renderBooking(data);
+        } catch (error) {
+            this.bookingBox.innerHTML = `
+                <div class="text-center py-4 booking-warning">
+                    <i class="bi bi-exclamation-triangle fs-1 text-warning d-block mb-2"></i>
+                    <div class="fw-medium">No booking found</div>
+                    <div class="text-muted">for plate <span class="badge bg-warning text-dark">${reg}</span></div>
+                </div>
+            `;
+        }
+    }
+
+    renderBooking(booking) {
+        const arrivalDate = booking.arrival ? new Date(booking.arrival) : null;
+        
+        this.bookingBox.innerHTML = `
+            <div class="booking-success p-3 rounded">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="plate-display">${booking.reg || ''}</div>
+                    <span class="badge bg-success">${booking.status || 'unknown'}</span>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="fw-medium text-success">Customer</div>
+                        <div>${booking.customer || ''}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fw-medium text-success">Booking ID</div>
+                        <div><code>${booking.bookingId || ''}</code></div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fw-medium text-success">Product</div>
+                        <div>${booking.product || ''}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fw-medium text-success">Terminal</div>
+                        <div>${booking.terminal || ''}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fw-medium text-success">Arrival</div>
+                        <div>${arrivalDate ? arrivalDate.toLocaleString() : ''}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fw-medium text-success">Phone</div>
+                        <div>${booking.phone || ''}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Mock API for testing without backend
+    async mockFetch(url) {
+        const urlObj = new URL(url, location.origin);
+        const reg = (urlObj.searchParams.get('reg') || '').toUpperCase();
+        const validRegs = ['AB12CDE', 'REZ123', 'STAR001', 'GF12ABC'];
+        const found = validRegs.includes(reg);
+        
+        return new Response(
+            found ? JSON.stringify({
+                reg,
+                status: 'due in',
+                customer: 'Test User',
+                product: 'Meet and Greet',
+                terminal: 'T3',
+                arrival: new Date(Date.now() + 3600000).toISOString(),
+                phone: '+44 7700 900123',
+                bookingId: 'SP-TEST'
+            }) : 'not found',
+            {
+                status: found ? 200 : 404,
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
+    }
+
+    // Self tests for normalisePlate function
+    runTests() {
+        if (!this.testOutput) return;
+        
+        const testCases = [
+            ['AB12 CDE', 'AB12CDE'],
+            ['ab12cde', 'AB12CDE'],
+            ['0O12 CDE', '0012CDE'], // O to 0
+            ['A1 REZ', 'A1REZ'],
+            ['STAR 1', 'STAR1'],
+            ['bad text no plate', null],
+            ['GF12 ABC parked', 'GF12ABC'],
+        ];
+        
+        let passed = 0;
+        let failed = 0;
+        const results = [];
+        
+        for (const [input, expected] of testCases) {
+            const result = this.normalisePlate(input);
+            if (result === expected) {
+                passed++;
+                results.push(`PASS ${input} -> ${result}`);
+            } else {
+                failed++;
+                results.push(`FAIL ${input} -> ${result} expected ${expected}`);
+            }
+        }
+        
+        this.testOutput.textContent = results.join('\n') + `\nSummary: ${passed} passed, ${failed} failed`;
+    }
+}
