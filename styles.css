@@ -20,6 +20,10 @@
 body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
+}
+
+/* Complaints Desk specific styles */
+#complaints-desk {
     background-color: #f8fafc;
 }
 
@@ -514,13 +518,13 @@ body {
 /* Additional styles for messaging control room interface */
 
 /* Messaging specific body styles */
-body.messaging-backend {
+#messaging-backend {
     background-color: #f8fafc;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Customer items */
-.customer-item {
+#messaging-backend .customer-item {
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
     background-color: #f1f5f9;
@@ -528,17 +532,17 @@ body.messaging-backend {
     transition: all 0.2s;
 }
 
-.customer-item:hover {
+#messaging-backend .customer-item:hover {
     background-color: white;
 }
 
-.customer-item.selected {
+#messaging-backend .customer-item.selected {
     border-color: #0f172a;
     background-color: white;
 }
 
 /* Messaging badge styles */
-.badge-whatsapp {
+#messaging-backend .badge-whatsapp {
     background-color: #000000 !important;
     color: white !important;
     transition: background-color 0.2s;
@@ -546,7 +550,7 @@ body.messaging-backend {
     border-radius: 50px !important;
 }
 
-.badge-sms {
+#messaging-backend .badge-sms {
     background-color: #000000 !important;
     color: white !important;
     transition: background-color 0.2s;
@@ -554,12 +558,12 @@ body.messaging-backend {
     border-radius: 50px !important;
 }
 
-.customer-item:hover .badge-whatsapp,
-.customer-item:hover .badge-sms {
+#messaging-backend .customer-item:hover .badge-whatsapp,
+#messaging-backend .customer-item:hover .badge-sms {
     background-color: #414554 !important;
 }
 
-.customer-item .badge:not(.badge-whatsapp):not(.badge-sms) {
+#messaging-backend .customer-item .badge:not(.badge-whatsapp):not(.badge-sms) {
     background-color: #f3f4f6 !important;
     color: #374151 !important;
     border: 1px solid #d1d5db !important;
@@ -569,33 +573,33 @@ body.messaging-backend {
 }
 
 /* Selected customer item styles */
-.customer-item.selected .badge-whatsapp,
-.customer-item.selected .badge-sms {
+#messaging-backend .customer-item.selected .badge-whatsapp,
+#messaging-backend .customer-item.selected .badge-sms {
     background-color: #f4f7fa !important;
     color: #374151 !important;
 }
 
-.customer-item.selected .badge:not(.badge-whatsapp):not(.badge-sms) {
+#messaging-backend .customer-item.selected .badge:not(.badge-whatsapp):not(.badge-sms) {
     background-color: white !important;
     color: #374151 !important;
     border-color: #d1d5db !important;
 }
 
 /* Template and history items */
-.template-item {
+#messaging-backend .template-item {
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
     background-color: white;
 }
 
-.history-item {
+#messaging-backend .history-item {
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
     background-color: white;
 }
 
 /* Preview box */
-.preview-box {
+#messaging-backend .preview-box {
     background-color: #f8fafc;
     border-radius: 0.5rem;
     padding: 0.75rem;
@@ -604,25 +608,25 @@ body.messaging-backend {
 }
 
 /* Stats cards */
-.stats-card {
+#messaging-backend .stats-card {
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
     background-color: white;
 }
 
-.stats-card .display-6 {
+#messaging-backend .stats-card .display-6 {
     font-size: 1.5rem !important;
 }
 
 /* Message bubbles */
-.message-bubble-received {
+#messaging-backend .message-bubble-received {
     background-color: white;
     border-radius: 1rem 1rem 1rem 0.25rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     max-width: 80%;
 }
 
-.message-bubble-sent {
+#messaging-backend .message-bubble-sent {
     background-color: #dcfce7;
     border-radius: 1rem 1rem 0.25rem 1rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -630,34 +634,34 @@ body.messaging-backend {
 }
 
 /* Messaging form controls */
-.messaging-backend .form-control, 
-.messaging-backend .form-select {
+#messaging-backend .form-control, 
+#messaging-backend .form-select {
     border-radius: 0.5rem;
     border: 1px solid #d1d5db;
 }
 
 /* Messaging buttons */
-.messaging-backend .btn {
+#messaging-backend .btn {
     border-radius: 0.5rem;
 }
 
-.messaging-backend .btn-primary {
+#messaging-backend .btn-primary {
     background-color: #0f172a;
     border-color: #0f172a;
 }
 
-.messaging-backend .btn-outline-secondary {
+#messaging-backend .btn-outline-secondary {
     border-color: #d1d5db;
     color: #6b7280;
 }
 
 /* Scrollable areas */
-.scrollable {
+#messaging-backend .scrollable {
     max-height: 320px;
     overflow-y: auto;
 }
 
-.live-thread {
+#messaging-backend .live-thread {
     height: 320px;
     overflow-y: auto;
     background-color: #f8fafc;
@@ -666,7 +670,7 @@ body.messaging-backend {
 }
 
 /* Calendar styling */
-.calendar-container {
+#messaging-backend .calendar-container {
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
     padding: 0.5rem;
@@ -676,18 +680,18 @@ body.messaging-backend {
     overflow: visible;
 }
 
-.calendar-grid {
+#messaging-backend .calendar-grid {
     width: 100%;
 }
 
-.calendar-dates {
+#messaging-backend .calendar-dates {
     display: grid !important;
     grid-template-columns: repeat(7, 1fr) !important;
     gap: 2px !important;
     width: 100%;
 }
 
-.calendar-date {
+#messaging-backend .calendar-date {
     padding: 0.375rem 0.125rem;
     text-align: center;
     border-radius: 0.25rem;
@@ -702,34 +706,34 @@ body.messaging-backend {
     box-sizing: border-box;
 }
 
-.calendar-date:hover {
+#messaging-backend .calendar-date:hover {
     background-color: #f1f5f9;
 }
 
-.calendar-date.selected {
+#messaging-backend .calendar-date.selected {
     background-color: #0f172a;
     color: white;
 }
 
-.calendar-date.other-month {
+#messaging-backend .calendar-date.other-month {
     color: #9ca3af;
 }
 
-.calendar-date.today {
+#messaging-backend .calendar-date.today {
     background-color: #e2e7ef;
     font-weight: 600;
 }
 
 /* Messaging specific text sizes */
-.messaging-backend .text-xs {
+#messaging-backend .text-xs {
     font-size: 0.75rem;
 }
 
-.messaging-backend .text-sm {
+#messaging-backend .text-sm {
     font-size: 0.875rem;
 }
 
-.line-clamp-2 {
+#messaging-backend .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -738,72 +742,72 @@ body.messaging-backend {
 }
 
 /* Messaging dropdown styles */
-.messaging-backend .dropdown-item:hover {
+#messaging-backend .dropdown-item:hover {
     background-color: #e2e7ef !important;
 }
 
 /* Messaging form field focus styles */
-.messaging-backend .form-control:focus,
-.messaging-backend .form-select:focus {
+#messaging-backend .form-control:focus,
+#messaging-backend .form-select:focus {
     border-color: #97a3b8 !important;
     box-shadow: 0 0 0 0.2rem rgba(151, 163, 184, 0.25) !important;
 }
 
 /* Messaging checkbox styles */
-.messaging-backend .form-check-input:checked {
+#messaging-backend .form-check-input:checked {
     background-color: black !important;
     border-color: black !important;
 }
 
-.messaging-backend .form-check-input:focus {
+#messaging-backend .form-check-input:focus {
     border-color: #97a3b8 !important;
     box-shadow: 0 0 0 0.2rem rgba(151, 163, 184, 0.25) !important;
 }
 
 /* Live thread customer name styling */
-.messaging-backend .card-body h6 + .badge {
+#messaging-backend .card-body h6 + .badge {
     background-color: #f8f9fa !important;
     color: #000000 !important;
     border: 1px solid #dee2e6 !important;
 }
 
 /* Upload file and Queue button text color */
-.messaging-backend .btn-outline-secondary {
+#messaging-backend .btn-outline-secondary {
     color: #000000 !important;
 }
 
-.messaging-backend .btn-outline-secondary:hover {
+#messaging-backend .btn-outline-secondary:hover {
     color: #000000 !important;
     background-color: #f2f5f9 !important;
     border-color: #d1d5db !important;
 }
 
 /* Schedule and A/B test toggle switches - bigger size */
-#scheduleSwitch,
-#abTestSwitch {
+#messaging-backend #scheduleSwitch,
+#messaging-backend #abTestSwitch {
     width: 3rem !important;
     height: 1.5rem !important;
 }
 
-#scheduleSwitch:checked,
-#abTestSwitch:checked {
+#messaging-backend #scheduleSwitch:checked,
+#messaging-backend #abTestSwitch:checked {
     width: 3rem !important;
     height: 1.5rem !important;
 }
 
 /* Compose section responsive fixes */
-.messaging-backend .d-flex.justify-content-between.align-items-start .d-flex.flex-wrap {
+#messaging-backend .d-flex.justify-content-between.align-items-start .d-flex.flex-wrap {
     max-width: 100%;
     overflow: hidden;
 }
 
 @media (max-width: 1200px) {
-    .messaging-backend .d-flex.justify-content-between.align-items-start {
+    #messaging-backend .d-flex.justify-content-between.align-items-start {
         flex-direction: column !important;
         align-items: stretch !important;
     }
     
-    .messaging-backend .d-flex.flex-wrap.align-items-center {
+    #messaging-backend .d-flex.flex-wrap.align-items-center {
         justify-content: flex-start !important;
         margin-top: 0.5rem;
     }
@@ -812,156 +816,156 @@ body.messaging-backend {
 /* Mobile Responsive Styles for Messaging */
 @media (max-width: 991.98px) {
     /* Header adjustments */
-    .messaging-backend .container-fluid {
+    #messaging-backend .container-fluid {
         padding: 0.75rem !important;
     }
     
     /* Header layout for mobile */
-    .messaging-backend .d-flex.justify-content-between.align-items-center.mb-4 {
+    #messaging-backend .d-flex.justify-content-between.align-items-center.mb-4 {
         flex-direction: column !important;
         gap: 1rem !important;
         align-items: stretch !important;
     }
     
     /* Search input full width on mobile */
-    .messaging-backend .position-relative input {
+    #messaging-backend .position-relative input {
         width: 100% !important;
     }
     
     /* Main grid - stack columns on mobile */
-    .messaging-backend .row.g-4 {
+    #messaging-backend .row.g-4 {
         --bs-gutter-x: 1rem !important;
     }
     
     /* Compose section adjustments */
-    .messaging-backend .d-flex.justify-content-between.align-items-start {
+    #messaging-backend .d-flex.justify-content-between.align-items-start {
         flex-direction: column !important;
         align-items: stretch !important;
     }
     
-    .messaging-backend .d-flex.flex-wrap.align-items-center {
+    #messaging-backend .d-flex.flex-wrap.align-items-center {
         flex-direction: column !important;
         align-items: stretch !important;
         gap: 0.5rem !important;
     }
     
-    .messaging-backend .d-flex.flex-wrap.align-items-center select,
-    .messaging-backend .d-flex.flex-wrap.align-items-center button {
+    #messaging-backend .d-flex.flex-wrap.align-items-center select,
+    #messaging-backend .d-flex.flex-wrap.align-items-center button {
         width: 100% !important;
     }
     
-    .messaging-backend .row.g-3 .col-4,
-    .messaging-backend .row.g-3 .col-6 {
+    #messaging-backend .row.g-3 .col-4,
+    #messaging-backend .row.g-3 .col-6 {
         flex: 0 0 100% !important;
         max-width: 100% !important;
         margin-bottom: 1rem !important;
     }
     
     /* Template variables - stack on mobile */
-    .messaging-backend #templateVariables .row .col-4 {
+    #messaging-backend #templateVariables .row .col-4 {
         flex: 0 0 100% !important;
         max-width: 100% !important;
         margin-bottom: 0.5rem !important;
     }
     
     /* Smart options - 2 columns on tablets, 1 on mobile */
-    .messaging-backend .row.g-3 .col-4 .form-check {
+    #messaging-backend .row.g-3 .col-4 .form-check {
         margin-bottom: 0.5rem !important;
     }
     
     /* Calendar adjustments for mobile */
-    .messaging-backend .calendar-container {
+    #messaging-backend .calendar-container {
         max-width: 100% !important;
     }
     
     /* Stats cards - 2 columns on mobile */
-    .messaging-backend .mt-4 .row.g-3 .col-3 {
+    #messaging-backend .mt-4 .row.g-3 .col-3 {
         flex: 0 0 50% !important;
         max-width: 50% !important;
         margin-bottom: 0.5rem !important;
     }
     
     /* Scrollable areas smaller height on mobile */
-    .messaging-backend .scrollable {
+    #messaging-backend .scrollable {
         max-height: 250px !important;
     }
     
-    .messaging-backend .live-thread {
+    #messaging-backend .live-thread {
         height: 250px !important;
     }
 }
 
 @media (max-width: 575.98px) {
     /* Extra small screens */
-    .messaging-backend .container-fluid {
+    #messaging-backend .container-fluid {
         padding: 0.5rem !important;
     }
     
-    .messaging-backend .h2 {
+    #messaging-backend .h2 {
         font-size: 1.25rem !important;
     }
     
     /* Template select dropdowns stack on very small screens */
-    .messaging-backend .d-flex.flex-column.flex-md-row {
+    #messaging-backend .d-flex.flex-column.flex-md-row {
         gap: 0.75rem !important;
     }
     
     /* Stats cards single column on very small screens */
-    .messaging-backend .mt-4 .row.g-3 .col-3 {
+    #messaging-backend .mt-4 .row.g-3 .col-3 {
         flex: 0 0 100% !important;
         max-width: 100% !important;
     }
     
     /* Calendar adjustments for very small screens */
-    .messaging-backend .calendar-date {
+    #messaging-backend .calendar-date {
         min-height: 20px !important;
         font-size: 0.65rem !important;
         padding: 0.125rem 0.05rem !important;
     }
     
     /* Stats numbers smaller on very small screens */
-    .messaging-backend .stats-card .display-6 {
+    #messaging-backend .stats-card .display-6 {
         font-size: 1.25rem !important;
     }
     
     /* Reduce padding on cards more */
-    .messaging-backend .card-body {
+    #messaging-backend .card-body {
         padding: 0.5rem !important;
     }
     
     /* Button adjustments */
-    .messaging-backend .btn {
+    #messaging-backend .btn {
         font-size: 0.8rem !important;
         padding: 0.25rem 0.5rem !important;
     }
     
     /* Customer tags wrap better */
-    .messaging-backend .customer-item .badge {
+    #messaging-backend .customer-item .badge {
         font-size: 0.65rem !important;
         padding: 0.125rem 0.4rem !important;
     }
     
     /* Message bubbles adjust to screen */
-    .messaging-backend .message-bubble-received,
-    .messaging-backend .message-bubble-sent {
+    #messaging-backend .message-bubble-received,
+    #messaging-backend .message-bubble-sent {
         max-width: 90% !important;
         font-size: 0.75rem !important;
     }
     
     /* Compose section button row */
-    .messaging-backend .d-flex.justify-content-between.align-items-center.mt-3 {
+    #messaging-backend .d-flex.justify-content-between.align-items-center.mt-3 {
         flex-direction: column !important;
         gap: 0.75rem !important;
         align-items: stretch !important;
     }
     
-    .messaging-backend .d-flex.align-items-center.gap-3 {
+    #messaging-backend .d-flex.align-items-center.gap-3 {
         justify-content: center !important;
         gap: 0.5rem !important;
     }
     
     /* Hide or adjust some elements for very small screens */
-    .messaging-backend .text-xs.text-muted:last-child {
+    #messaging-backend .text-xs.text-muted:last-child {
         text-align: center !important;
         font-size: 0.65rem !important;
     }
